@@ -1,0 +1,70 @@
+HTML
+======================================================================================================================
+
+                 <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                              <div id="Div7">
+                                 <iframe name="hiddenFrame" width="0" height="0" style="display: none;"></iframe>
+                                 <form id="form" enctype="multipart/form-data" method="post" target="hiddenFrame">
+                                   <span class="btn  fileinput-button" style= "height:27px; color:white; background-color:#85C1E9;"><input style=" margin-left:-10px; margin-top:-4px; height:21px; color:white; background-color:#85C1E9;" onchange="OnClickSelect();" type="file"name="file" id="flUpload" multiple accept=".xls,.xlsx,.txt,.ppt,.pptx,.pdf,image/*" /></span>
+                                    <input style="height:27px; color:white; background-color:#3C8DBC;" onclick="OnClickUpload();" type="submit" id="Button1" value="Upload" />
+                                </form>
+                             </div>
+                </div>  
+
+======================================================================================================================
+javascript
+======================================================================================================================
+     function OnClickSelect() {
+        var iSize = ($("#flUpload")[0].files[0].size / 1024);
+        var iSizeMB = (iSize / 1024).toFixed(2);
+        if (iSize / 1024 < 5){
+            document.getElementById("Button1").disabled = false;
+            }
+        else{
+            alert("File Size = " + iSizeMB + " MB. Please Upload file size less than 5 MB");
+            document.getElementById('flUpload').value = null;
+        }
+    }
+ 	
+   function OnClickUpload()
+    {
+        var formData = new FormData($('#form')[0]);
+               $.ajax({
+               type: 'POST',
+               processData: false,
+               contentType: false,
+               data: formData,
+               success: function (data) {
+                   $('.result').text('File uploaded Successfully.');
+                   document.getElementById('flUpload').value = null;
+                   document.getElementById("Button1").disabled = true;
+                   setTimeout(function () { $('.result').text(''); }, 3000);
+               },
+               error: function (data) {
+                   $('.result').text('Whoops! There was an error in the request.');
+               }
+               });
+    }
+======================================================================================================================
+CSHTML
+======================================================================================================================
+@{ 
+    bool post = false;
+    var storageloc = "E:\\SUNIL\\Thermography\\";
+    int files = 0;
+    if(IsPost) {
+        post = true;
+        files = Request.Files.Count;
+    }
+        if(files > 0) {
+            // Files are sent!
+            for (int i = 0; i < files; i++) {
+                var file = Request.Files[i];
+                // Got the image...
+                string fileName = Path.GetFileName(file.FileName);
+                // Save the file...
+                file.SaveAs(storageloc + fileName);
+            }
+        }
+    }
+}
